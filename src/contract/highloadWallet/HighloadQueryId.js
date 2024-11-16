@@ -1,7 +1,7 @@
-const BIT_NUMBER_SIZE = 10n; // 10 bit
-const SHIFT_SIZE = 13n; // 13 bit
-const MAX_BIT_NUMBER = 1022n;
-const MAX_SHIFT = 8191n; // 2^13 = 8192
+const BIT_NUMBER_SIZE = BigInt(10); // 10 bit
+const SHIFT_SIZE = BigInt(13); // 13 bit
+const MAX_BIT_NUMBER = BigInt(1022);
+const MAX_SHIFT = BigInt(8191); // 2^13 = 8192
 
 class HighloadQueryId {
     constructor() {
@@ -9,12 +9,12 @@ class HighloadQueryId {
          * @private
          * @type {bigint} [0 .. 8191]
          */
-        this.shift = 0n;
+        this.shift = BigInt(0);
         /**
          * @private
          * @type {bigint} [0 .. 1022]
          */
-        this.bitnumber = 0n;
+        this.bitnumber =  BigInt(0);
     }
 
     /**
@@ -34,16 +34,16 @@ class HighloadQueryId {
     }
 
     getNext() {
-        let newBitnumber = this.bitnumber + 1n;
+        let newBitnumber = this.bitnumber + BigInt(1);
         let newShift = this.shift;
 
-        if (newShift === MAX_SHIFT && newBitnumber > (MAX_BIT_NUMBER - 1n)) {
+        if (newShift === MAX_SHIFT && newBitnumber > (MAX_BIT_NUMBER - BigInt(1))) {
             throw new Error('Overload'); // NOTE: we left one queryId for emergency withdraw
         }
 
         if (newBitnumber > MAX_BIT_NUMBER) {
-            newBitnumber = 0n;
-            newShift += 1n;
+            newBitnumber = BigInt(0);
+            newShift += BigInt(1);
             if (newShift > MAX_SHIFT) {
                 throw new Error('Overload')
             }
@@ -53,7 +53,7 @@ class HighloadQueryId {
     }
 
     hasNext() {
-        const isEnd = this.bitnumber >= (MAX_BIT_NUMBER - 1n) && this.shift === MAX_SHIFT; // NOTE: we left one queryId for emergency withdraw;
+        const isEnd = this.bitnumber >= (MAX_BIT_NUMBER - BigInt(1)) && this.shift === MAX_SHIFT; // NOTE: we left one queryId for emergency withdraw;
         return !isEnd;
     }
 
@@ -84,7 +84,7 @@ class HighloadQueryId {
      */
     static fromQueryId(queryId) {
         const shift = queryId >> BIT_NUMBER_SIZE;
-        const bitnumber = queryId & 1023n;
+        const bitnumber = queryId & BigInt(1023);
         return this.fromShiftAndBitNumber(shift, bitnumber);
     }
 
@@ -93,8 +93,8 @@ class HighloadQueryId {
      * @return {HighloadQueryId}
      */
     static fromSeqno(i) {
-        const shift = i / 1023n;
-        const bitnumber = i % 1023n;
+        const shift = i / BigInt(1023);
+        const bitnumber = i % BigInt(1023);
         return this.fromShiftAndBitNumber(shift, bitnumber);
     }
 
@@ -102,7 +102,7 @@ class HighloadQueryId {
      * @return {bigint} [0 .. 8380415]
      */
     toSeqno() {
-        return this.bitnumber + this.shift * 1023n;
+        return this.bitnumber + this.shift * BigInt(1023);
     }
 }
 
